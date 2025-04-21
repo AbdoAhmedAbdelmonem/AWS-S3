@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CloudyShare | AWS File Sharing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --secondary: #10B981;
+            --dark: #0F172A;
+            --darker: #020617;
+            --light: #E2E8F0;
+            --lighter: #F8FAFC;
+            --accent: #F59E0B;
+            --card-bg: #1E293B;
+            --border: #334155;
+            --warning: #ff0000;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: var(--dark);
+            color: var(--light);
+            min-height: 100vh;
+            transition: all 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .logo i {
+            font-size: 2.25rem;
+            color: var(--accent);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--light);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+        }
+
+        nav a:hover {
+            background-color: var(--primary);
+            color: var(--lighter);
+        }
+
+        .hero {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            max-width: 700px;
+            margin-bottom: 2rem;
+            color: #94A3B8;
+        }
+
+        .upload-container {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 3rem;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .upload-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0.5rem;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 0.75rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary);
+            background-color: rgba(139, 92, 246, 0.05);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .upload-area h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--lighter);
+        }
+
+        .upload-area p {
+            color: #94A3B8;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: var(--lighter);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background-color: #7C3AED;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2);
+        }
+
+        .btn-secondary {
+            background-color: var(--card-bg);
+            color: var(--primary);
+            border: 1px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(139, 92, 246, 0.1);
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+        }
+
+        .file-list {
+            margin-top: 3rem;
+        }
+
+        .file-list h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: var(--lighter);
+        }
+
+        .file-list h2 i {
+            color: var(--accent);
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .file-card {
+            background: var(--card-bg);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .file-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+            border-color: var(--primary);
+        }
+
+        .file-icon {
+            width: 3rem;
+            height: 3rem;
+            background-color: rgba(139, 92, 246, 0.1);
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+
+        .file-name {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--lighter);
+        }
+
+        .file-meta {
+            font-size: 0.875rem;
+            color: #94A3B8;
+            display: flex;
+            justify-content: space-between;
+        }
+        .file-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.file-actions a.file-download,
+.file-actions button.file-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  border: none;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 4px 18px;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Download Button */
+.file-download {
+  background: linear-gradient(135deg, var(--secondary), var(--primary));
+  color: #fff;
+        animation: 0.5s ease-in-out;
+}
+
+.file-download:hover {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  transform: translateY(-2px);
+}
+
+/* Delete Button */
+.file-delete {
+  background: linear-gradient(135deg, var(--warning), var(--accent));
+  color: #fff;
+    animation: 0.5s ease-in-out;
+}
+
+.file-delete:hover {
+  background: linear-gradient(135deg, var(--accent), var(--warning));
+  transform: translateY(-2px);
+}
+
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 5rem;
+        }
+
+        .feature-card {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.2);
+            border-color: var(--primary);
+        }
+
+        .feature-icon {
+            width: 3.5rem;
+            height: 3.5rem;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.2) 100%);
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+            font-size: 1.75rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 1rem;
+            color: var(--lighter);
+        }
+
+        .feature-card p {
+            color: #94A3B8;
+            line-height: 1.6;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 5rem;
+            padding: 2rem 0;
+            border-top: 1px solid var(--border);
+            color: #94A3B8;
+        }
+
+        .aws-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background-color: rgba(255, 153, 0, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            margin-top: 1rem;
+            font-weight: 600;
+            color: #FBBF24;
+            border: 1px solid rgba(255, 153, 0, 0.2);
+        }
+
+        .aws-badge i {
+            color: #FBBF24;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background-color: var(--border);
+            border-radius: 3px;
+            margin-top: 1rem;
+            overflow: hidden;
+            display: none;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .status-message {
+            margin-top: 1rem;
+            color: var(--light);
+            display: none;
+        }
+
+        .account-tab {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .account-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .account-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1001;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .passcode-popup {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            border: 1px solid var(--primary);
+            position: relative;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .passcode-popup h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            text-align: center;
+            font-size: 1.5rem;
+        }
+
+        .passcode-input {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .passcode-input input {
+            width: 3rem;
+            height: 3rem;
+            text-align: center;
+            font-size: 1.5rem;
+            border-radius: 0.5rem;
+            border: 2px solid var(--border);
+            background: var(--darker);
+            color: var(--light);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .passcode-input input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.3);
+        }
+
+        .passcode-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .passcode-submit:hover {
+            background: #7C3AED;
+        }
+
+        .credentials-popup {
+            background: var(--card-bg);
+            border-radius: 1rem;
+            padding: 2rem;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+            border: 1px solid var(--primary);
+            position: relative;
+        }
+
+        .credentials-popup h3 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .credential-item {
+            margin-bottom: 1.5rem;
+        }
+
+        .credential-item label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #94A3B8;
+            font-size: 0.875rem;
+        }
+
+        .credential-value {
+            background: var(--darker);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            word-break: break-all;
+            position: relative;
+            border: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(139, 92, 246, 0.1);
+            border: none;
+            color: var(--primary);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            color: #94A3B8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .error-message {
+            color: #EF4444;
+            text-align: center;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .upload-container {
+                padding: 2rem 1.5rem;
+            }
+
+            nav ul {
+                gap: 1rem;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .account-btn {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+        }
+        .masked {
+            font-family: monospace;
+            letter-spacing: 2px;
+            color: #94A3B8;
+        }
+
+        .security-warning {
+            margin-top: 2rem;
+            padding: 0.75rem;
+            background-color: rgba(239, 68, 68, 0.1);
+            border-radius: 0.5rem;
+            color: #EF4444;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .security-warning i {
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <img src="https://img.notionusercontent.com/s3/prod-files-secure%2F6acc16cf-ee9f-4506-8122-5ec57d2688c5%2Faf08b444-b0f7-4b0e-8d96-b2e4e47f7034%2FBlue_Modern_Cloud_Storage_Service_Logo__3_-removebg-preview.png/size/w=250?exp=1745159621&sig=N_VIsUd4FpmrDmKpoMNq39SkEZ4QnZx5rumkK9XLsOA&id=1db2e465-a86c-8097-9ba7-c188b2654063&table=block&userId=543dfa1b-5174-48d9-9dec-45e5c1d2e8b5" alt="" style="width: 70px; height: 70px; object-fit: contain;">
+                <span>CloudyShare</span>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">Upload</a></li>
+                    <li><a href="#">Files</a></li>
+                    <li><a href="#">Team</a></li>
+                </ul>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <h1>Simple, Secure File Sharing on AWS</h1>
+            <p>Upload your files to Amazon S3 with our lightweight web application. Perfect for team collaboration and personal storage.</p>
+            <div class="aws-badge">
+                <i class="fab fa-aws"></i>
+                <span>Powered by AWS EC2 & S3</span>
+            </div>
+        </section>
+
+        <section class="upload-container">
+            <div class="upload-area" id="dropArea">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <h3>Drag & Drop Your Files Here</h3>
+                <p>or click to browse your device</p>
+                <input type="file" id="fileInput" style="display: none;">
+                <button class="btn" onclick="document.getElementById('fileInput').click()">
+                    <i class="fas fa-folder-open"></i> Select Files
+                </button>
+                <div class="progress-bar">
+                    <div class="progress" id="uploadProgress"></div>
+                </div>
+                <div class="status-message" id="statusMessage"></div>
+            </div>
+            <div class="actions">
+                <button class="btn" id="uploadButton" disabled>
+                    <i class="fas fa-upload"></i> Upload Now
+                </button>
+                <button class="btn btn-secondary" id="refreshButton">
+                    <i class="fas fa-sync-alt"></i> Refresh Files
+                </button>
+            </div>
+        </section>
+
+        <section class="file-list">
+            <h2><i class="fas fa-file-alt"></i> Your Files</h2>
+            <div class="file-grid" id="fileGrid">
+            </div>
+        </section>
+
+        <section class="features">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Secure Storage</h3>
+                <p>All files are securely stored in Amazon S3 with proper IAM permissions and encryption at rest.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3>Fast Transfers</h3>
+                <p>Leverage AWS's global infrastructure for fast upload and download speeds from anywhere.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3>Team Collaboration</h3>
+                <p>Perfect for student teams working on projects together with easy file sharing.</p>
+            </div>
+        </section>
+
+        <footer>
+            <p>© 2025 CloudyShare - AWS File Sharing Project</p>
+            <p>Created by Cloudy_Computer Team for Educational Purposes</p>
+        </footer>
+    </div>
+
+    <div class="account-tab">
+        <button class="account-btn" id="accountBtn">
+            <i class="fas fa-user-cog"></i>
+            Account
+        </button>
+    </div>
+
+    <div class="overlay" id="overlay">
+        <div class="passcode-popup" id="passcodePopup">
+            <button class="close-btn" id="closePasscode">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3><i class="fas fa-lock"></i> Enter Passcode</h3>
+            <div class="passcode-input">
+                <input type="password" maxlength="1" data-index="0">
+                <input type="password" maxlength="1" data-index="1">
+                <input type="password" maxlength="1" data-index="2">
+                <input type="password" maxlength="1" data-index="3">
+            </div>
+            <button class="passcode-submit" id="submitPasscode">Verify</button>
+            <div class="error-message" id="passcodeError">
+                Incorrect passcode. Please try again.
+            </div>
+        </div>
+        <div class="credentials-popup" id="credentialsPopup" style="display: none;">
+            <button class="close-btn" id="closeCredentials">
+                <i class="fas fa-times"></i>
+            </button>
+            <h3><i class="fas fa-key"></i> AWS Credentials</h3>
+
+            <div class="credential-item">
+                <label>Access Key ID</label>
+                <div class="credential-value access-key-id">
+                    <span class="credential-text">Loading...</span>
+                    <button class="copy-btn" onclick="copyAccessKey()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="credential-item">
+                <label>Secret Access Key</label>
+                <div class="credential-value secret-access-key">
+                    <span class="credential-text masked">******</span>
+                    <button class="copy-btn" onclick="revealSecretKey()">
+                        <i class="fas fa-eye"></i> Show
+                    </button>
+                    <button class="copy-btn secret-copy-btn" onclick="copySecretKey()" style="display: none;">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="credential-item">
+                <label>S3 Bucket Name</label>
+                <div class="credential-value s3-bucket-name">
+                    <span class="credential-text">Loading...</span>
+                    <button class="copy-btn" onclick="copyBucketName()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="credential-item">
+                <label>AWS Region</label>
+                <div class="credential-value aws-region">
+                    <span class="credential-text">Loading...</span>
+                    <button class="copy-btn" onclick="copyRegion()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                </div>
+            </div>
+
+            <div class="security-warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Never share these credentials publicly</span>
+            </div>
+        </div>
+    </div>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1040.0.min.js"></script>
+
+    <script>
+        // AWS Configuration
+        let awsConfig = {
+            AWS_ACCESS_KEY: '',
+            AWS_SECRET_KEY: '*****',
+            S3_BUCKET: '',
+            AWS_REGION: ''
+        };
+
+        // Initialize AWS SDK after config is loaded
+        let s3;
+
+        async function loadAWSConfig() {
+            try {
+                const response = await fetch('http://localhost:3000/aws-config');
+                const config = await response.json();
+
+                awsConfig = {
+                    AWS_ACCESS_KEY: config.AWS_ACCESS_KEY,
+                    AWS_SECRET_KEY: config.AWS_SECRET_KEY,
+                    S3_BUCKET: config.S3_BUCKET,
+                    AWS_REGION: config.AWS_REGION
+                };
+
+                // Update UI with credentials
+                document.querySelector('.access-key-id .credential-text').textContent = awsConfig.AWS_ACCESS_KEY;
+                document.querySelector('.s3-bucket-name .credential-text').textContent = awsConfig.S3_BUCKET;
+                document.querySelector('.aws-region .credential-text').textContent = awsConfig.AWS_REGION;
+
+                // Initialize AWS SDK with the loaded config
+                AWS.config.update({
+                    region: awsConfig.AWS_REGION,
+                    credentials: new AWS.Credentials({
+                        accessKeyId: awsConfig.AWS_ACCESS_KEY,
+                        secretAccessKey: awsConfig.AWS_SECRET_KEY
+                    })
+                });
+
+                s3 = new AWS.S3();
+                console.log('AWS SDK initialized');
+
+
+            } catch (error) {
+                console.error('Error fetching AWS config:', error);
+                document.querySelector('.access-key-id .credential-text').textContent = 'Error loading credentials';
+                showStatus('Error loading AWS configuration', 'error');
+            }
+        }
+        loadAWSConfig();
+
+        // UI Elements
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.getElementById('uploadButton');
+        const refreshButton = document.getElementById('refreshButton');
+        const fileGrid = document.getElementById('fileGrid');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressBar = document.querySelector('.progress-bar');
+        const statusMessage = document.getElementById('statusMessage');
+        const accountBtn = document.getElementById('accountBtn');
+        const overlay = document.getElementById('overlay');
+        const passcodePopup = document.getElementById('passcodePopup');
+        const credentialsPopup = document.getElementById('credentialsPopup');
+        const closePasscode = document.getElementById('closePasscode');
+        const closeCredentials = document.getElementById('closeCredentials');
+        const submitPasscode = document.getElementById('submitPasscode');
+        const passcodeInputs = document.querySelectorAll('.passcode-input input');
+        const passcodeError = document.getElementById('passcodeError');
+
+        const SECRET_PASSCODE = '7620';
+        let selectedFiles = [];
+
+        // Event Listeners
+        function setupEventListeners() {
+            // File upload events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            dropArea.addEventListener('drop', handleDrop, false);
+            fileInput.addEventListener('change', handleFileSelect, false);
+            uploadButton.addEventListener('click', handleUpload);
+            refreshButton.addEventListener('click', loadFiles);
+
+            // Account/passcode events
+            accountBtn.addEventListener('click', showPasscodePopup);
+            closePasscode.addEventListener('click', closeAllPopups);
+            closeCredentials.addEventListener('click', closeAllPopups);
+            submitPasscode.addEventListener('click', verifyPasscode);
+
+            // Passcode input handling
+            passcodeInputs.forEach((input, index) => {
+                input.addEventListener('input', (e) => {
+                    if (e.target.value.length === 1 && index < passcodeInputs.length - 1) {
+                        passcodeInputs[index + 1].focus();
+                    }
+                });
+
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && e.target.value.length === 0 && index > 0) {
+                        passcodeInputs[index - 1].focus();
+                    }
+                });
+
+                input.addEventListener('keyup', (e) => {
+                    if (e.key === 'Enter' && index === passcodeInputs.length - 1) {
+                        verifyPasscode();
+                    }
+                });
+            });
+        }
+
+        // File Upload Functions
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight() {
+            dropArea.style.borderColor = 'var(--primary)';
+            dropArea.style.backgroundColor = 'rgba(139, 92, 246, 0.1)';
+        }
+
+        function unhighlight() {
+            dropArea.style.borderColor = 'var(--border)';
+            dropArea.style.backgroundColor = '';
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles(files);
+        }
+
+        function handleFileSelect(e) {
+            handleFiles(e.target.files);
+        }
+
+        function handleFiles(files) {
+            selectedFiles = Array.from(files);
+            if (selectedFiles.length > 0) {
+                uploadButton.disabled = false;
+                showStatus(`Ready to upload ${selectedFiles.length} file(s)`, 'info');
+            }
+        }
+
+        async function handleUpload() {
+            if (selectedFiles.length === 0) return;
+
+            progressBar.style.display = 'block';
+            uploadButton.disabled = true;
+
+            try {
+                for (let i = 0; i < selectedFiles.length; i++) {
+                    const file = selectedFiles[i];
+                    await uploadFileToServer(file);
+                }
+
+                showStatus('All files uploaded successfully!', 'success');
+                loadFiles();
+            } catch (error) {
+                console.error('Upload error:', error);
+                showStatus('Upload failed: ' + error.message, 'error');
+            } finally {
+                uploadProgress.style.width = '0%';
+                setTimeout(() => progressBar.style.display = 'none', 2000);
+                selectedFiles = [];
+                fileInput.value = '';
+            }
+        }
+
+        async function uploadFileToServer(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                const response = await fetch('http://localhost:3000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Upload failed');
+                }
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                throw error;
+            }
+        }
+
+        // File Management Functions
+        async function loadFiles() {
+            try {
+                showStatus('Loading files...', 'info');
+                const response = await fetch('http://localhost:3000/files');
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch files');
+                }
+
+                const data = await response.json();
+                displayFiles(data.files);
+                showStatus('Files loaded successfully', 'success');
+            } catch (error) {
+                console.error('Error loading files:', error);
+                showStatus('Error loading files: ' + error.message, 'error');
+            }
+        }
+
+        function displayFiles(files) {
+            fileGrid.innerHTML = '';
+
+            if (!files || files.length === 0) {
+                fileGrid.innerHTML = '<p>No files found. Upload some files to get started!</p>';
+                return;
+            }
+
+            files.forEach(file => {
+                const fileCard = document.createElement('div');
+                fileCard.className = 'file-card';
+
+                const fileType = getFileType(file.filename);
+                const fileSize = formatFileSize(file.size);
+                const lastModified = new Date(file.last_modified).toLocaleString();
+
+                fileCard.innerHTML = `
+                    <div class="file-icon">
+                        <i class="fas ${getFileIcon(fileType)}"></i>
+                    </div>
+                    <div class="file-name">${file.filename}</div>
+                    <div class="file-meta">
+                        <span>${fileSize}</span>
+                        <span>${lastModified}</span>
+                    </div>
+                    <div class="file-actions">
+                        <a href="${file.download_url}" class="file-download" target="_blank">
+                            <i class="fas fa-download"></i> Download
+                        </a>
+                        <button class="file-delete" data-filename="${file.filename}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+
+                fileGrid.appendChild(fileCard);
+            });
+
+            // Add event listeners for delete buttons
+            document.querySelectorAll('.file-delete').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const filename = e.target.getAttribute('data-filename') ||
+                                   e.target.parentElement.getAttribute('data-filename');
+                    deleteFile(filename);
+                });
+            });
+        }
+
+        async function deleteFile(filename) {
+            if (!confirm(`Are you sure you want to delete ${filename}?`)) return;
+
+            try {
+                showStatus(`Deleting ${filename}...`, 'info');
+                const response = await fetch(`http://localhost:3000/delete/${encodeURIComponent(filename)}`, {
+                    method: 'DELETE'
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Delete failed');
+                }
+
+                showStatus(`File ${filename} deleted successfully`, 'success');
+                loadFiles();
+            } catch (error) {
+                console.error('Delete error:', error);
+                showStatus('Error deleting file: ' + error.message, 'error');
+            }
+        }
+
+        // Utility Functions
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.style.display = 'block';
+            statusMessage.style.color = type === 'error' ? '#EF4444' :
+                                      type === 'success' ? '#10B981' :
+                                      'var(--light)';
+
+            if (type === 'success' || type === 'error') {
+                setTimeout(() => {
+                    statusMessage.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        function getFileType(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            return extension;
+        }
+
+        function getFileIcon(fileType) {
+            const icons = {
+                pdf: 'fa-file-pdf',
+                jpg: 'fa-file-image',
+                jpeg: 'fa-file-image',
+                png: 'fa-file-image',
+                gif: 'fa-file-image',
+                txt: 'fa-file-alt',
+                doc: 'fa-file-word',
+                docx: 'fa-file-word',
+                xls: 'fa-file-excel',
+                xlsx: 'fa-file-excel',
+                ppt: 'fa-file-powerpoint',
+                pptx: 'fa-file-powerpoint',
+                zip: 'fa-file-archive',
+                rar: 'fa-file-archive',
+                mp3: 'fa-file-audio',
+                wav: 'fa-file-audio',
+                mp4: 'fa-file-video',
+                mov: 'fa-file-video',
+                html: 'fa-file-code',
+                css: 'fa-file-code',
+                js: 'fa-file-code',
+                json: 'fa-file-code'
+            };
+
+            return icons[fileType] || 'fa-file';
+        }
+
+        function formatFileSize(bytes) {
+            if (!bytes) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Credential Management Functions
+        function showCredentialsPopup() {
+            loadAWSConfig();
+            document.getElementById('credentialsPopup').style.display = 'block';
+        }
+
+        function copyAccessKey() {
+            if (awsConfig) {
+                copyToClipboard(awsConfig.AWS_ACCESS_KEY);
+                showStatus('Access Key copied to clipboard', 'success');
+            }
+        }
+
+        function revealSecretKey() {
+            if (confirm('Are you sure you want to reveal the secret key?')) {
+                document.querySelector('.secret-access-key .credential-text').classList.remove('masked');
+                document.querySelector('.secret-access-key .credential-text').textContent = awsConfig.AWS_SECRET_KEY;
+                document.querySelector('.secret-access-key button:nth-of-type(1)').style.display = 'none';
+                document.querySelector('.secret-access-key .secret-copy-btn').style.display = 'inline-block';
+            }
+        }
+
+        function copySecretKey() {
+            if (awsConfig) {
+                copyToClipboard(awsConfig.AWS_SECRET_KEY);
+                showStatus('Secret Key copied to clipboard', 'success');
+            }
+        }
+
+        function copyBucketName() {
+            if (awsConfig) {
+                copyToClipboard(awsConfig.S3_BUCKET);
+                showStatus('Bucket name copied to clipboard', 'success');
+            }
+        }
+
+        function copyRegion() {
+            if (awsConfig) {
+                copyToClipboard(awsConfig.AWS_REGION);
+                showStatus('Region copied to clipboard', 'success');
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const copyBtns = document.querySelectorAll('.copy-btn');
+                copyBtns.forEach(btn => {
+                    btn.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                });
+                event.target.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => {
+                    event.target.innerHTML = '<i class="fas fa-copy"></i> Copy';
+                }, 2000);
+            });
+        }
+
+        // Passcode Functions
+        function showPasscodePopup() {
+            overlay.style.display = 'flex';
+            passcodePopup.style.display = 'block';
+            credentialsPopup.style.display = 'none';
+            passcodeError.style.display = 'none';
+
+            // Clear inputs
+            passcodeInputs.forEach(input => {
+                input.value = '';
+            });
+
+            // Focus first input
+            passcodeInputs[0].focus();
+        }
+
+        function closeAllPopups() {
+            overlay.style.display = 'none';
+        }
+
+        function verifyPasscode() {
+            const enteredPasscode = Array.from(passcodeInputs)
+                .map(input => input.value)
+                .join('');
+
+            if (enteredPasscode === SECRET_PASSCODE) {
+                passcodePopup.style.display = 'none';
+                credentialsPopup.style.display = 'block';
+                passcodeError.style.display = 'none';
+            } else {
+                passcodeError.style.display = 'block';
+
+                passcodePopup.style.animation = 'none';
+                void passcodePopup.offsetWidth; // Trigger reflow
+                passcodePopup.style.animation = 'shake 0.5s ease';
+
+                // Clear inputs
+                passcodeInputs.forEach(input => {
+                    input.value = '';
+                });
+                passcodeInputs[0].focus();
+            }
+        }
+
+        // Initialize the application
+        function init() {
+            setupEventListeners();
+            loadFiles(); // Load files when page loads
+
+            // Add shake animation style
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+
+        // Start the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1040.0.min.js"></script>
+</body>
+</html>
