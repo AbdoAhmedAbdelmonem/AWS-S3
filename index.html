@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="Blue_Modern_Cloud_Storage_Service_Logo__3_-removebg-preview.png" type="image/x-icon">
     <title>CloudyShare | AWS File Sharing</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -609,6 +608,14 @@
             letter-spacing: 2px;
             color: #94A3B8;
         }
+        header {
+            display: block;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
 
         .security-warning {
             margin-top: 2rem;
@@ -643,6 +650,12 @@
                     <li><a href="#">Team</a></li>
                 </ul>
             </nav>
+                <div class="account-tab">
+                    <button class="account-btn" id="accountBtn">
+                        <i class="fas fa-user-cog"></i>
+                        Account
+                    </button>
+                </div>
         </header>
 
         <section class="hero">
@@ -712,13 +725,6 @@
             <p>© 2025 CloudyShare - AWS File Sharing Project</p>
             <p>Created by Cloudy_Computer Team for Educational Purposes</p>
         </footer>
-    </div>
-
-    <div class="account-tab">
-        <button class="account-btn" id="accountBtn">
-            <i class="fas fa-user-cog"></i>
-            Account
-        </button>
     </div>
 
     <div class="overlay" id="overlay">
